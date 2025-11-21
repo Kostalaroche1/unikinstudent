@@ -1,0 +1,211 @@
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+html,
+body {
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: Arial, Helvetica, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+@media (prefers-color-scheme: dark) {
+  html {
+    color-scheme: dark;
+  }
+}
+
+/* from google font-size */
+body {
+  font-family: var(--font-inter), sans-serif;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-montserrat), sans-serif;
+}
+
+
+
+/* card css */
+.clamp-text {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  /* number of lines to show */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* bietu color */
+.bietu-background {
+  background-color: rgb(47, 47, 247);
+}
+
+/* carousel */
+.size-5 {
+  font-size: 5em;
+}
+
+.size-4 {
+  font-size: 4em;
+}
+
+.size-3 {
+  font-size: 3em;
+}
+
+.size-2 {
+  font-size: 2em;
+}
+
+/* map google and contact*/
+.map-container {
+  width: 100%;
+  height: 250px;
+}
+
+@media (min-width: 768px) {
+  .map-container {
+    height: 100%;
+    min-height: 300px;
+  }
+}
+
+/* scrol to the position x */
+html {
+  scroll-behavior: smooth;
+}
+
+/* css navbar admin or vertical */
+
+
+/* Sidebar Modal Slide From Left */
+.side-modal .modal-dialog {
+  position: fixed;
+  top: 0;
+  left: -280px;
+  /* hidden offscreen */
+  margin: 0;
+  height: 100vh;
+  max-width: 280px;
+  transition: left 0.3s ease-in-out;
+}
+
+.side-modal.show .modal-dialog {
+  left: 0;
+  /* slide in */
+}
+
+.side-modal-content {
+  height: 100%;
+  border-radius: 0;
+}
+
+.side-backdrop {
+  background-color: rgba(0, 0, 0, 0.4);
+}
+
+
+/* not found page bietu */
+.not-found-bietu {
+
+  background-image: url("/bietuphoto/exception/image/notFound.png");
+  background-position: center;
+  background-attachment: fixed;
+  background-size: cover;
+  background-repeat: no-repeat;
+  object-fit: cover;
+  opacity: 0.9;
+  box-sizing: border-box;
+}
+
+
+/* Navbar */
+
+.nav-link {
+  color: #f7f5f5 !important;
+  position: relative;
+  transition: color 0.3s ease;
+  opacity: 0.9;
+}
+
+.nav-link:hover {
+  color: #e5e5e5 !important;
+  opacity: 1;
+  /* slightly darker hover color */
+}
+
+.nav-link::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0%;
+  height: 2px;
+  background-color: white;
+  color: white;
+  opacity: 1;
+  transition: width 0.3s ease;
+}
+
+.nav-link:hover::after {
+  width: 100%;
+}
+
+/* When active (clicked), bar stays visible */
+.nav-link.active {
+  color: white !important;
+  opacity: 1;
+}
+
+.nav-link.active::after {
+  width: 100%;
+}
+
+/* page animation */
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.page {
+  animation: fadeIn 0.6s ease-in-out;
+}
