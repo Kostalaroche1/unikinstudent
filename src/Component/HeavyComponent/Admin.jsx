@@ -131,6 +131,7 @@ import { Button, Table, Form, Modal } from "react-bootstrap";
 import { FaEdit, FaTrash, FaPlus, FaBackward } from "react-icons/fa";
 import { useUserContext } from "../ContextComponent/UserAuth";
 import Link from "next/link";
+import { getAuth } from "./AuthForm";
 
 export default function BooksAdmin() {
     const [books, setBooks] = useState([]);
@@ -181,18 +182,19 @@ export default function BooksAdmin() {
 
     function openEdit(bookPara) {
         console.log(bookPara)
-        setEditing(book);
+        setEditing(bookPara);
         setTitle(bookPara.title);
         setDescription(bookPara.description || '');
         setAuthor(bookPara.author || "")
         setPrice(bookPara.price || "")
         setFile(null);
         setShow(true);
-        console.log(book, "book", "title", title, "descripion", description, "author", author, "price", price, "file", file)
+        console.log(book, "book", "title", title, "descripion", description,
+            "author", author, "price", price, "file", file, "book para", bookPara)
     }
 
     async function handleSubmit() {
-
+        console.log(editing, "book", "title", title, "descripion", description, "author", author, "price", price, "file", file,)
         if (!title.trim()) return alert('Le titre est requis');
         setLoading(true);
         try {
