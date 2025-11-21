@@ -151,10 +151,10 @@ export default function HomePage() {
                             <Dropdown.Item as={Link} href={"/admin"}>
                                 <FaUser className="me-2" />  {session.user?.name}
                             </Dropdown.Item>
-                            <Dropdown.Item as={Link} href={"/admin"}>
+                            {user.role === 'superadmin' && <Dropdown.Item as={Link} href={"/admin"}>
                                 <FaPersonBooth className="me-2" />  Dashboard
                             </Dropdown.Item>
-                            <Dropdown.Item onClick={async () => deleteCookie()}>
+                            }<Dropdown.Item onClick={async () => deleteCookie()}>
                                 <FiLogOut className="me-2" />    Deconnecter
                             </Dropdown.Item>
                             <Dropdown.Item as={Link} href="/auth">

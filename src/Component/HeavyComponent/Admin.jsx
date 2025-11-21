@@ -132,6 +132,7 @@ import { FaEdit, FaTrash, FaPlus, FaBackward } from "react-icons/fa";
 import { useUserContext } from "../ContextComponent/UserAuth";
 import Link from "next/link";
 import { getAuth } from "./AuthForm";
+import { useRouter } from "next/navigation";
 
 export default function BooksAdmin() {
     const [books, setBooks] = useState([]);
@@ -145,7 +146,7 @@ export default function BooksAdmin() {
     const [file, setFile] = useState(null);
     const [loading, setLoading] = useState(false);
     const { book, setBook, user, setUser } = useUserContext()
-
+    const router = useRouter()
     async function fetchBooks() {
         if (!user) {
             const dataAuth = await getAuth()
@@ -153,6 +154,13 @@ export default function BooksAdmin() {
                 setUser(dataAuth)
             }
         }
+        if (user) {
+            if (user.role === "user" || user.role === "admin") {
+                router.back("/")
+            }
+        }
+
+
 
         try {
             const res = await fetch('/api/book');
