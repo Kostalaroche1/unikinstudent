@@ -146,16 +146,18 @@ export default function BooksAdmin() {
     const [file, setFile] = useState(null);
     const [loading, setLoading] = useState(false);
     const { book, setBook, user, setUser } = useUserContext()
+
     const router = useRouter()
     async function fetchBooks() {
+        const dataAuth = await getAuth()
+
         if (!user) {
-            const dataAuth = await getAuth()
             if (dataAuth) {
                 setUser(dataAuth)
             }
         }
         if (user) {
-            if (user.role !== "superadmin") {
+            if (user.role !== "superadmin" || dataAuth.role !== "superadmin") {
                 router.back("/")
             }
         }
