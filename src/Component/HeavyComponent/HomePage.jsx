@@ -1,5 +1,4 @@
 
-
 "use client";
 
 import { useEffect, useId, useState } from "react";
@@ -107,7 +106,7 @@ export default function HomePage() {
                     <img src="/bietuphoto/unikin_logo.png" alt="unikin logo" />
                 </p>
 
-                {((user === null) || Object.keys(user).length === 0) ? (
+                {((user === null) || Object.keys(user).length === 0) || !session ? (
                     <>
                         <Dropdown align="end" className="ms-0">
                             <Dropdown.Toggle
@@ -159,7 +158,6 @@ export default function HomePage() {
                 )
                 }
             </div>
-
             <SearchBar search={search} setSearch={setSearch} />
             <BookCard book={book} />
         </div>

@@ -9,6 +9,12 @@ import Modal from "react-bootstrap/Modal";
 import { useUserContext } from "../ContextComponent/UserAuth";
 import { sendMail } from "./AuthForm";
 import { useSession } from "next-auth/react";
+import dynamic from "next/dynamic";
+
+// Dynamically import PdfModal, only in browser
+const PdfModal = dynamic(() => import("./PdfModal"), {
+  ssr: false,
+});
 
 export default function BookCard({ book }) {
   const { user } = useUserContext();
@@ -24,9 +30,8 @@ export default function BookCard({ book }) {
   const checkSubscription = async () => {
     console.log(user)
     if (!user) {
-      alert("vous devez créer un compte  ou se connecter avant de s'abonner")
+      // alert("vous devez créer un compte  ou se connecter avant de s'abonner")
       return router.push("/auth")
-
     }
     const sub = await fetch("/api/subscription", {
       method: "POST",
@@ -63,11 +68,13 @@ export default function BookCard({ book }) {
   const handleRead = async (bk) => {
     if (!user) return router.push("/auth");
     if (user.idSub) {
-      const blod = await fetch(book.pdf_url)
-      const blodURL = URL.createObjectURL(blod)
-      alert("url blod inside handleRead", blodURL)
-      if (bk.pdf_url) {
-        setCurrentPdf(bk.pdf_url);
+      // const blod = await fetch(book.pdf_url)
+      // const blodURL = URL.createObjectURL(blod)
+      // alert("url blod inside handleRead", blodURL)
+      const url = bk.pdf_url?.trim()
+      if (url) {
+        // alert(url)
+        setCurrentPdf(url);
         setShowPdfModal(true);
         return;
       }
@@ -146,6 +153,13 @@ export default function BookCard({ book }) {
                       <Button variant="success" onClick={() => setShowModal({ sendCode: !showModal.sendCode, subscribed: false })}>
                         Buy / Download
                       </Button>
+
+
+                      <PdfModal
+                        show={showPdfModal}
+                        fileUrl={currentPdf}
+                        onClose={() => setShowPdfModal(false)}
+                      />
                       <ModalSubscribe
                         showModalSub={showModal} setShowModalSub={setShowModal}
                         expiredDate={expiredDate} setExpiredDate={setExpiredDate}
@@ -208,7 +222,7 @@ export default function BookCard({ book }) {
 
 
       {/* PDF Reader Modal */}
-      <Modal show={showPdfModal} onHide={() => setShowPdfModal(false)} size="xxl" centered>
+      {/* <Modal show={showPdfModal} onHide={() => setShowPdfModal(false)} size="xxl" centered>
         <Modal.Header closeButton>
           <Modal.Title>Read Book</Modal.Title>
         </Modal.Header>
@@ -228,7 +242,7 @@ export default function BookCard({ book }) {
             Close
           </Button>
         </Modal.Footer>
-      </Modal>
+      </Modal> */}
 
     </div>
   );
