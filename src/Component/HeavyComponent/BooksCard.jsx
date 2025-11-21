@@ -22,11 +22,30 @@ export default function BookCard({ book }) {
   const [codeSub, setCodeSub] = useState("")
 
   const checkSubscription = async () => {
-    await fetch("/api/subscription", {
+    console.log(user)
+    if (!user) {
+      alert("vous devez créer un compte  ou se connecter avant de s'abonner")
+      return router.push("/auth")
+
+    }
+    const sub = await fetch("/api/subscription", {
       method: "POST",
-      body: JSON.stringify({ userId: user.id_user ? user.id_user : null, expiredDate }),
+      body: JSON.stringify({ userId: user.id ? user.id : null, expiredDate }),
       headers: { "Content-Type": "application/json" },
     });
+    console.log(sub, "after subscription")
+    if (!sub.ok) {
+      return alert("error")
+    }
+    const data = await sub.json()
+    if (data.status) {
+      alert("vous vous venez d'etre abonner")
+      setCodeSub("")
+      setTimeout(() => {
+        setShowModal({ sendCode: false, subscribed: false })
+        setShowPdfModal(true)
+      }, 4000);
+    }
     // setCanDownload(true);
   };
 
@@ -42,7 +61,7 @@ export default function BookCard({ book }) {
   }
 
   const handleRead = async (bk) => {
-    // if (!user) return router.push("/auth");
+    if (!user) return router.push("/auth");
     if (user.idSub) {
       const blod = await fetch(book.pdf_url)
       const blodURL = URL.createObjectURL(blod)
@@ -106,20 +125,36 @@ export default function BookCard({ book }) {
                 <Card style={{ marginBottom: '13px' }}>
                   <Card.Img
                     variant="top"
-                    src={bk.image || "/bietuphoto/livre.jpg"}
-                    style={{ height: "250px", width: '320px' }}
+                    src={bk.image || "/bietuphoto/book.png"}
+                    style={{ height: "250px", width: '320px', objectFit: "cover" }}
                   />
                   <Card.Body >
                     <Card.Title>{bk.title}</Card.Title>
                     <Card.Text>Author: {bk.author}</Card.Text>
                     <Card.Text>Price: ${bk.price}</Card.Text>
                     <div className="d-flex justify-content-between">
-                      <Button variant="primary" onClick={() => handleRead(bk)}>
+                      <Button variant="primary" onClick={() => {
+                        if (user.idSub) {
+                          handleRead(bk)
+                        } else {
+                          setShowModal({ sendCode: true, subscribed: false })
+                        }
+                      }}>
                         Read
                       </Button>
+
                       <Button variant="success" onClick={() => setShowModal({ sendCode: !showModal.sendCode, subscribed: false })}>
                         Buy / Download
                       </Button>
+                      <ModalSubscribe
+                        showModalSub={showModal} setShowModalSub={setShowModal}
+                        expiredDate={expiredDate} setExpiredDate={setExpiredDate}
+                        user={user}
+                        handleRead={handleRead}
+                        checkSubscription={checkSubscription}
+                        codeSub={codeSub} setCodeSub={setCodeSub}
+                        bk={bk}
+                      />
                     </div>
                   </Card.Body>
                 </Card>
@@ -170,14 +205,7 @@ export default function BookCard({ book }) {
         </Modal.Footer>
       </Modal> */}
 
-      <ModalSubscribe
-        showModalSub={showModal} setShowModalSub={setShowModal}
-        expiredDate={expiredDate} setExpiredDate={setExpiredDate}
-        user={user}
-        handleRead={handleRead}
-        checkSubscription={checkSubscription}
-        codeSub={codeSub} setCodeSub={setCodeSub}
-      />
+
 
       {/* PDF Reader Modal */}
       <Modal show={showPdfModal} onHide={() => setShowPdfModal(false)} size="xxl" centered>
@@ -208,7 +236,7 @@ export default function BookCard({ book }) {
 
 
 export const ModalSubscribe = ({ showModalSub, setShowModalSub, expiredDate, setExpiredDate,
-  codeSub, setCodeSub, user, handleRead, checkSubscription }) => {
+  codeSub, setCodeSub, user, handleRead, checkSubscription, bk }) => {
 
 
 
@@ -216,7 +244,7 @@ export const ModalSubscribe = ({ showModalSub, setShowModalSub, expiredDate, set
 
 
   return (
-    <Modal show={showModalSub.sendCode || showModalSub.subscribed} onHide={() => setShowModalSub({ sendCode: false, subscribed: false })}>
+    <Modal show={showModalSub.sendCode || showModalSub.subscribed} onHide={() => true}>
       <Modal.Header closeButton>
         <Modal.Title>{showModalSub.sendCode ? "ABONNEZ-VOUS DANS BIBLIOTHEQUE EN LINE" : showModalSub.subscribed ? `CONFIRMER LE CODE ENVOYER DANS ${user.email}` : ""}</Modal.Title>
       </Modal.Header>
@@ -232,12 +260,12 @@ export const ModalSubscribe = ({ showModalSub, setShowModalSub, expiredDate, set
           {showModalSub.subscribed && <input type="text" placeholder="code de confirmation à l'abonnement" value={codeSub} onChange={(e) => setCodeSub(e.target.value)} className="form-control mb-2" required />}            </>
       </Modal.Body>
       <Modal.Footer>
-        <Button variant="secondary" onClick={() => setShowModalSub({ sendCode, subscribed: false })}>
+        <Button variant="secondary" onClick={() => setShowModalSub({ sendCode: false, subscribed: false })}>
           Fermer
         </Button>
         {showModalSub.sendCode ? (
           <Button variant="success"
-            onClick={handleRead}
+            onClick={() => handleRead(bk)}
           >
             Abonner
           </Button>

@@ -28,17 +28,21 @@ export async function GET(req) {
 // CREATE SUBSCRIPTION
 export async function POST(req) {
     try {
-        const { userId, expiresAt } = await req.json();
-
+        const { userId, expiredDate } = await req.json();
+        console.log(userId, "userIde and ", expiredDate, "ExpireDate")
         const [result] = await connectionDatabase.execute(
             "INSERT INTO subscription (userId, expiresAt) VALUES (?, ?)",
-            [userId, expiresAt]
+            [userId, expiredDate]
         );
 
-        return NextResponse.json({ insertedId: result.insertId });
+        return NextResponse.json({
+            // insertedId: result.insertId
+            status: true
+        });
 
     } catch (error) {
-        return NextResponse.json({ error: error.message }, { status: 500 });
+        console.log(error, "error")
+        return NextResponse.json({ error: error.message, status: false });
     }
 }
 
@@ -46,7 +50,6 @@ export async function POST(req) {
 export async function PUT(req) {
     try {
         const { id_sub, userId, expiresAt } = await req.json();
-
         const [result] = await connectionDatabase.execute(
             `UPDATE subscription
        SET userId = ?, expiresAt = ?
