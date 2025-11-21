@@ -188,6 +188,7 @@ export default function BooksAdmin() {
         setPrice(bookPara.price || "")
         setFile(null);
         setShow(true);
+        console.log(book, "book", "title", title, "descripion", description, "author", author, "price", price, "file", file)
     }
 
     async function handleSubmit() {

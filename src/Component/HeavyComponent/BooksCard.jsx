@@ -54,7 +54,7 @@ export default function BookCard({ book }) {
     if (!user) {
       return false
     }
-    const res = await fetch(`/api/subscription?userId=${user.id_user}`);
+    const res = await fetch(`/api/subscription?userId=${user.id}`);
     const data = await res.json();
     return data.subscribed || false;
 

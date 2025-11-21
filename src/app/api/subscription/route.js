@@ -3,19 +3,21 @@ import { connectionDatabase } from "../../../../lib/database";
 
 // GET ALL or GET ONE
 export async function GET(req) {
+
+    const db = await connectionDatabase()
     try {
         const { searchParams } = new URL(req.url);
         const id = searchParams.get("id"); // optional
 
         if (id) {
-            const [rows] = await connectionDatabase.execute(
+            const [rows] = await db.execute(
                 "SELECT * FROM subscription WHERE id_sub = ?",
                 [id]
             );
             return NextResponse.json(rows[0] || null);
         }
 
-        const [rows] = await connectionDatabase.execute(
+        const [rows] = await db.execute(
             "SELECT * FROM subscription"
         );
         return NextResponse.json(rows);
@@ -28,10 +30,12 @@ export async function GET(req) {
 // CREATE SUBSCRIPTION
 export async function POST(req) {
     try {
+        const db = await connectionDatabase()
+
         const { userId, expiredDate } = await req.json();
         console.log(userId, "userIde and ", expiredDate, "ExpireDate")
-        const [result] = await connectionDatabase.execute(
-            "INSERT INTO subscription (userId, expiresAt) VALUES (?, ?)",
+        const [result] = await db.execute(
+            "INSERT INTO subscriptions (id_user, expiresAt) VALUES (?, ?)",
             [userId, expiredDate]
         );
 
@@ -49,8 +53,11 @@ export async function POST(req) {
 // UPDATE SUBSCRIPTION
 export async function PUT(req) {
     try {
+        const db = await connectionDatabase()
+
+
         const { id_sub, userId, expiresAt } = await req.json();
-        const [result] = await connectionDatabase.execute(
+        const [result] = await db.execute(
             `UPDATE subscription
        SET userId = ?, expiresAt = ?
        WHERE id_sub = ?`,
@@ -68,8 +75,9 @@ export async function PUT(req) {
 export async function DELETE(req) {
     try {
         const { id_sub } = await req.json();
+        const db = await connectionDatabase()
 
-        const [result] = await connectionDatabase.execute(
+        const [result] = await db.execute(
             "DELETE FROM subscription WHERE id_sub = ?",
             [id_sub]
         );
