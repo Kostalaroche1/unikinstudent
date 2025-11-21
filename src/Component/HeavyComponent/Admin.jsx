@@ -155,7 +155,7 @@ export default function BooksAdmin() {
             }
         }
         if (user) {
-            if (user.role === "user" || user.role === "admin") {
+            if (user.role !== "superadmin") {
                 router.back("/")
             }
         }
@@ -238,7 +238,7 @@ export default function BooksAdmin() {
 
     const filtered = books.filter(b => b.title.toLowerCase().includes(query.toLowerCase()));
 
-    return (
+    return (user.role === 'superadmin' &&
         <div className="container py-4">
             <div className="d-flex justify-content-between align-items-center mb-3">
                 <Link href={"/"} className="list-unstyled"><FaBackward /> Gestion des PDF (Livres)</Link>
