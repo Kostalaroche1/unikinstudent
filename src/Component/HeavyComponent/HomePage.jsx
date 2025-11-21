@@ -95,10 +95,17 @@ export default function HomePage() {
         }
     }
 
+
     useEffect(() => {
         fetchBooks()
 
     }, [])
+
+
+    const filteredBooks = book.filter((bk) =>
+        bk.title.toLowerCase().includes(search.toLowerCase())
+    );
+
     return (
         <div className="container mt-4">
             <div className="w-100 d-flex justify-content-between align-items-center">
@@ -159,7 +166,7 @@ export default function HomePage() {
                 }
             </div>
             <SearchBar search={search} setSearch={setSearch} />
-            <BookCard book={book} />
+            <BookCard book={filteredBooks} />
         </div>
     );
 }

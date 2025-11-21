@@ -32,16 +32,18 @@ export async function GET(req) {
 export async function POST(req) {
     try {
         const { userId, bookId } = await req.json();
-
-        const [result] = await connectionDatabase.execute(
-            "INSERT INTO history (userId, bookId) VALUES (?, ?)",
+        console.log(userId, "user id", bookId, 'book id')
+        const db = await connectionDatabase()
+        const [result] = await db.execute(
+            "INSERT INTO purchases (id_user, id_book) VALUES (?, ?)",
             [userId, bookId]
         );
-
-        return NextResponse.json({ insertedId: result.insertId });
-
+        const requestSelectB = "select * from purchases where id_user=? and id_book=?"
+        const [resultSelect] = await db.execute(requestSelectB, [userId, bookId])
+        return NextResponse.json({ insertedId: result.insertId, purchase: resultSelect, status: true });
     } catch (error) {
-        return NextResponse.json({ error: error.message }, { status: 500 });
+        console.log(error)
+        return NextResponse.json({ error: error.message, status: false });
     }
 }
 
