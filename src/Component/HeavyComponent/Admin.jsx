@@ -1,130 +1,4 @@
 
-
-// 'use client';
-// import React, { useEffect, useState, useMemo } from 'react';
-// import BookForm from '../../components/BookForm';
-// import BookList from '../../components/BookList';
-// import { Row, Col, Card, Form } from 'react-bootstrap';
-
-// export default function AdminPage() {
-//     const [books, setBooks] = useState([]);
-//     const [loading, setLoading] = useState(true);
-//     const [editing, setEditing] = useState(null);
-//     const [query, setQuery] = useState('');
-
-//     useEffect(() => {
-//         fetchBooks();
-//     }, []);
-
-//     async function fetchBooks() {
-//         setLoading(true);
-//         try {
-//             const res = await fetch('/api/books');
-//             const data = await res.json();
-//             setBooks(data || []);
-//         } catch (err) {
-//             console.error(err);
-//             alert('Failed to load books');
-//         } finally {
-//             setLoading(false);
-//         }
-//     }
-
-//     async function handleCreate(payload) {
-//         // payload includes image_url already if uploaded to Cloudinary
-//         const res = await fetch('/api/books', {
-//             method: 'POST',
-//             headers: { 'Content-Type': 'application/json' },
-//             body: JSON.stringify(payload),
-//         });
-//         if (res.ok) {
-//             const book = await res.json();
-//             setBooks(prev => [book, ...prev]);
-//             return true;
-//         }
-//         const err = await res.text();
-//         throw new Error(err || 'Create failed');
-//     }
-
-//     async function handleUpdate(id, payload) {
-//         const res = await fetch(`/api/books/${id}`, {
-//             method: 'PUT',
-//             headers: { 'Content-Type': 'application/json' },
-//             body: JSON.stringify(payload),
-//         });
-//         if (res.ok) {
-//             const updated = await res.json();
-//             setBooks(prev => prev.map(b => (b.id === updated.id ? updated : b)));
-//             setEditing(null);
-//             return true;
-//         }
-//         throw new Error('Update failed');
-//     }
-
-//     async function handleDelete(id) {
-//         if (!confirm('Delete this book?')) return;
-//         const res = await fetch(`/api/books/${id}`, { method: 'DELETE' });
-//         if (res.ok) {
-//             setBooks(prev => prev.filter(b => b.id !== id));
-//         } else {
-//             alert('Delete failed');
-//         }
-//     }
-
-//     const filtered = useMemo(() => {
-//         const q = query.trim().toLowerCase();
-//         if (!q) return books;
-//         return books.filter(b =>
-//             (b.title || '').toLowerCase().includes(q) ||
-//             (b.author || '').toLowerCase().includes(q)
-//         );
-//     }, [books, query]);
-
-//     return (
-//         <div>
-//             <Row className="g-4">
-//                 <Col lg={4} md={5}>
-//                     <Card>
-//                         <Card.Body>
-//                             <Card.Title>{editing ? 'Edit Book' : 'Add Book'}</Card.Title>
-//                             <BookForm
-//                                 initial={editing}
-//                                 onCreate={handleCreate}
-//                                 onUpdate={handleUpdate}
-//                                 onCancel={() => setEditing(null)}
-//                             />
-//                         </Card.Body>
-//                     </Card>
-//                 </Col>
-
-//                 <Col lg={8} md={7}>
-//                     <Card>
-//                         <Card.Body>
-//                             <div className="d-flex justify-content-between align-items-center mb-3">
-//                                 <h5 className="mb-0">Books</h5>
-//                                 <Form.Control
-//                                     placeholder="Search by title or author..."
-//                                     value={query}
-//                                     onChange={e => setQuery(e.target.value)}
-//                                     style={{ maxWidth: 320 }}
-//                                 />
-//                             </div>
-
-//                             <BookList
-//                                 books={filtered}
-//                                 loading={loading}
-//                                 onEdit={b => setEditing(b)}
-//                                 onDelete={handleDelete}
-//                             />
-//                         </Card.Body>
-//                     </Card>
-//                 </Col>
-//             </Row>
-//         </div>
-//     );
-// }
-
-
 "use client";
 import React, { useEffect, useState } from "react";
 import { Button, Table, Form, Modal } from "react-bootstrap";
@@ -133,6 +7,7 @@ import { useUserContext } from "../ContextComponent/UserAuth";
 import Link from "next/link";
 import { getAuth } from "./AuthForm";
 import { useRouter } from "next/navigation";
+import PdfViewer from "./PdfViewer";
 
 export default function BooksAdmin() {
     const [books, setBooks] = useState([]);
@@ -157,7 +32,7 @@ export default function BooksAdmin() {
             }
         }
         if (user) {
-            if (user.role !== "superadmin" || dataAuth.role !== "superadmin") {
+            if (user && user.role !== "superadmin" || dataAuth.role !== "superadmin") {
                 router.back("/")
             }
         }
@@ -199,12 +74,10 @@ export default function BooksAdmin() {
         setPrice(bookPara.price || "")
         setFile(null);
         setShow(true);
-        console.log(book, "book", "title", title, "descripion", description,
-            "author", author, "price", price, "file", file, "book para", bookPara)
+
     }
 
     async function handleSubmit() {
-        console.log(editing, "book", "title", title, "descripion", description, "author", author, "price", price, "file", file,)
         if (!title.trim()) return alert('Le titre est requis');
         setLoading(true);
         try {
@@ -240,7 +113,7 @@ export default function BooksAdmin() {
 
     const filtered = books.filter(b => b.title.toLowerCase().includes(query.toLowerCase()));
 
-    return (user.role === 'superadmin' &&
+    return (user && user.role === 'superadmin' &&
         <div className="container py-4">
             <div className="d-flex justify-content-between align-items-center mb-3">
                 <Link href={"/"} className="list-unstyled"><FaBackward /> Gestion des PDF (Livres)</Link>
@@ -270,7 +143,7 @@ export default function BooksAdmin() {
                             <td style={{ maxWidth: 300, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} title={book.description}>{book.description}</td>
                             <td>{book.price}</td>
                             <td>{book.author}</td>
-                            <td><a href={book.pdf_url} target="_blank" rel="noreferrer">Ouvrir</a></td>
+                            <td><PdfViewer>ouvrir</PdfViewer></td>
                             <td>
                                 <Button size="sm" variant="warning" className="me-2" onClick={() => openEdit(book)}><FaEdit /></Button>
                                 <Button size="sm" variant="danger" onClick={() => handleDelete(book.id_book)}><FaTrash /></Button>
