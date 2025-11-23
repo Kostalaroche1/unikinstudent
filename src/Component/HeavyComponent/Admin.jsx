@@ -1,6 +1,6 @@
 
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { use, useEffect, useState } from "react";
 import { Button, Table, Form, Modal } from "react-bootstrap";
 import { FaEdit, FaTrash, FaPlus, FaBackward } from "react-icons/fa";
 import { useUserContext } from "../ContextComponent/UserAuth";
@@ -32,7 +32,7 @@ export default function BooksAdmin() {
             }
         }
         if (user) {
-            if (user?.role !== "superadmin" || dataAuth?.role !== "superadmin") {
+            if (Object.keys(user).length > 1 && user?.role !== "superadmin" || dataAuth && dataAuth?.role !== "superadmin") {
                 router.back("/")
             }
         }
