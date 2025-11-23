@@ -94,7 +94,7 @@ export const sendMailCode = async (userEmail, subject, text, user, keepCode = tr
     const cardUser = ` <div style="max-width: 600px; margin: auto; border: 1px solid #ddd; 
     border-radius: 5px; overflow: hidden; font-family: Arial, sans-serif;">
       <div style="background-color: #f8f9fa; padding: 15px; text-align: center;">
-        <h3 style="margin: 0; color: #343a40;">Bienvenu A Bietu</h3>
+        <h3 style="margin: 0; color: #343a40;">Bienvenu ALA BIBLIOTHEQUE UNIKIN ONLINE</h3>
       </div>
       <div style="padding: 20px;">
         <img src="${user ? user.image : ""}" alt="User Photo" style="display: block; margin: 0 auto 15px; 
@@ -111,7 +111,7 @@ export const sendMailCode = async (userEmail, subject, text, user, keepCode = tr
         </a>
       </div>
       <div style="background-color: #f8f9fa; padding: 10px; text-align: center; font-size: 12px; color: #6c757d;">
-        <p style="margin: 0;">&copy;  Bietu company </p>
+        <p style="margin: 0;">&copy;  Biblos Unikin  </p>
       </div>
     </div>
   `
