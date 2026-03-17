@@ -35,12 +35,12 @@ export async function POST(req) {
         const { userId, expiredDate } = await req.json();
         console.log(userId, "userIde and ", expiredDate, "ExpireDate")
         const [result] = await db.execute(
-            "INSERT INTO subscriptions (id_user, expiresAt) VALUES (?, ?)",
+            "INSERT INTO subscription (id_user, expiresAt) VALUES (?, ?)",
             [userId, expiredDate]
         );
 
         return NextResponse.json({
-            // insertedId: result.insertId
+            insertedId: result.insertId,
             status: true
         });
 
@@ -59,7 +59,7 @@ export async function PUT(req) {
         const { id_sub, userId, expiresAt } = await req.json();
         const [result] = await db.execute(
             `UPDATE subscription
-       SET userId = ?, expiresAt = ?
+       SET id_user = ?, expiresAt = ?
        WHERE id_sub = ?`,
             [userId, expiresAt, id_sub]
         );

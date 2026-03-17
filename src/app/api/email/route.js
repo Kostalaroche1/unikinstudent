@@ -31,12 +31,13 @@ export const PUT = async (req) => {
 
     console.log("name user", nameUser, "email", email);
     const dataCheckMail = await checkMailCode(codeCheckMail, codeAuth, expiredTime) //check if both codeFromUser and codeSendToUser math
+    console.log(dataCheckMail, "data check mail inside put")
     try {
         if (dataCheckMail) {
             let response
 
             const db = await connectionDatabase()
-            const requestSelectMail = "select * from users left join subscriptions  using(id_user) where email=?"
+            const requestSelectMail = "select * from users left join subscription using(id_user) where email=?"
 
             const [dataSelect] = await db.query(requestSelectMail, [email])
             console.log("dataSelect from users table ", dataSelect, "lenght dataselect", dataSelect.length, "name user", nameUser, "email", email);
@@ -52,7 +53,7 @@ export const PUT = async (req) => {
             const [data] = await db.query(requestSelectMail, [email])
 
             const users = {
-                name: data[0].name_user, email: data[0].email, id: data[0].id_user,
+                name: data[0].name, email: data[0].email, id: data[0].id_user,
                 role: data[0].role, idSub: data[0].id_sub, expireDate: data[0].expiresAt
             }
 

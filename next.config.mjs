@@ -27,13 +27,13 @@ const nextConfig = {
 
     serverExternalPackages: ["pdfjs-dist"],
 
-    webpack(config) {
-        config.resolve.fallback = {
-            ...(config.resolve.fallback || {}),
-            canvas: false,
-        };
-        return config;
-    },
+    // webpack(config) {
+    //     config.resolve.fallback = {
+    //         ...(config.resolve.fallback || {}),
+    //         canvas: false,
+    //     };
+    //     return config;
+    // },
 };
 
 export default nextConfig;

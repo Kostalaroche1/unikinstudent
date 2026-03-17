@@ -185,6 +185,7 @@ export function VerifyCodeModal({ show, setShow }) {
         body: JSON.stringify({ codeCheckMail }),
       });
       const data = await res.json();
+      console.log(data, 'data rom ')
       if (data.status) {
         setMessage("✅" + data.message);
         setUser(await getAuth())

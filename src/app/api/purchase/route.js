@@ -6,19 +6,20 @@ import { connectionDatabase } from "../../../../lib/database";
 // GET — ALL or ONE
 export async function GET(req) {
     try {
+        const db = await connectionDatabase();
         const { searchParams } = new URL(req.url);
         const id = searchParams.get("id");
 
         if (id) {
-            const [rows] = await connectionDatabase.execute(
-                "SELECT * FROM history WHERE id_purchase = ?",
+            const [rows] = await db.execute(
+                "SELECT * FROM purchase WHERE id_purchase = ?",
                 [id]
             );
             return NextResponse.json(rows[0] || null);
         }
 
-        const [rows] = await connectionDatabase.execute(
-            "SELECT * FROM history ORDER BY createdAt DESC"
+        const [rows] = await db.execute(
+            "SELECT * FROM purchase ORDER BY createdAt DESC"
         );
 
         return NextResponse.json(rows);
@@ -35,10 +36,10 @@ export async function POST(req) {
         console.log(userId, "user id", bookId, 'book id')
         const db = await connectionDatabase()
         const [result] = await db.execute(
-            "INSERT INTO purchases (id_user, id_book) VALUES (?, ?)",
+            "INSERT INTO purchase (id_user, id_book) VALUES (?, ?)",
             [userId, bookId]
         );
-        const requestSelectB = "select * from purchases where id_user=? and id_book=?"
+        const requestSelectB = "SELECT * FROM purchase WHERE id_user = ? AND id_book = ? ORDER BY id_purchase DESC"
         const [resultSelect] = await db.execute(requestSelectB, [userId, bookId])
         return NextResponse.json({ insertedId: result.insertId, purchase: resultSelect, status: true });
     } catch (error) {
@@ -51,9 +52,10 @@ export async function POST(req) {
 export async function PUT(req) {
     try {
         const { id, userId, bookId } = await req.json();
+        const db = await connectionDatabase();
 
-        const [result] = await connectionDatabase.execute(
-            "UPDATE history SET userId = ?, bookId = ? WHERE id_purchase = ?",
+        const [result] = await db.execute(
+            "UPDATE purchase SET id_user = ?, id_book = ? WHERE id_purchase = ?",
             [userId, bookId, id]
         );
 
@@ -68,9 +70,10 @@ export async function PUT(req) {
 export async function DELETE(req) {
     try {
         const { id } = await req.json();
+        const db = await connectionDatabase();
 
-        const [result] = await connectionDatabase.execute(
-            "DELETE FROM history WHERE id_purchase = ?",
+        const [result] = await db.execute(
+            "DELETE FROM purchase WHERE id_purchase = ?",
             [id]
         );
 

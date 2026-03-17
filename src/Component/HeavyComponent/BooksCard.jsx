@@ -27,6 +27,7 @@ export default function BookCard({ book }) {
   const [expiredDate, setExpiredDate] = useState("")
   const { data: session } = useSession()
   const [codeSub, setCodeSub] = useState("")
+  const books = Array.isArray(book) ? book : book ? [book] : [];
 
   const checkSubscription = async () => {
     console.log(user)
@@ -134,10 +135,10 @@ export default function BookCard({ book }) {
   return (
     <div className="container w-100">
       {
-        Array.isArray(book) && book.length !== 0 ?
+        books.length !== 0 ?
           <div className="row">
-            {book.map((bk, index) => (
-              <div className="col-lg-4 col-12" key={index}>
+            {books.map((bk, index) => (
+              <div className="col-lg-4 col-12" key={bk.id_book ?? bk.id ?? index}>
                 <Card style={{ marginBottom: '13px' }}>
                   <Card.Img
                     variant="top"
@@ -179,7 +180,7 @@ export default function BookCard({ book }) {
                       <PdfModal
                         show={currentPdfBuy.show}
                         fileUrl={currentPdfBuy.url}
-                        onClose={() => setShowPdfModal(false)}
+                        onClose={() => setCurrentPdfBuy({ show: false, url: "" })}
                       />
                       {/* for read book */}
                       <PdfModal
@@ -238,10 +239,10 @@ export const ModalSubscribe = ({ showModalSub, setShowModalSub, expiredDate, set
         <> {showModalSub.sendCode && <form onSubmit={(e) => e.preventDefault()}>
           <p>Enter your Visa card details to subscribe or buy the book:</p>
 
-          <input type="text" placeholder="Card Number" disabled={canDownload.sendCode} className="form-control mb-2" required />
-          <input type="text" placeholder="Expiry MM/YY" disabled={canDownload.sendCode} className="form-control mb-2" required />
-          <input type="text" placeholder="CVV" disabled={canDownload.sendCode} className="form-control mb-2" required />
-          <label htmlFor="expiredDate"></label> <input type="date" form="expiredDate" disabled={canDownload.sendCode} placeholder="dateExpire" value={expiredDate} onChange={(e) => setExpiredDate(e.target.value)} className="form-control mb-2" required />
+          <input type="text" placeholder="Card Number" className="form-control mb-2" required />
+          <input type="text" placeholder="Expiry MM/YY" className="form-control mb-2" required />
+          <input type="text" placeholder="CVV" className="form-control mb-2" required />
+          <label htmlFor="expiredDate"></label> <input type="date" form="expiredDate" placeholder="dateExpire" value={expiredDate} onChange={(e) => setExpiredDate(e.target.value)} className="form-control mb-2" required />
         </form>}
           {showModalSub.subscribed && <input type="text" placeholder="code de confirmation à l'abonnement" value={codeSub} onChange={(e) => setCodeSub(e.target.value)} className="form-control mb-2" required />}            </>
       </Modal.Body>
@@ -287,7 +288,7 @@ export const ModalBuy = ({ canDownload, setCanDownload, expiredDate, setExpiredD
           {canDownload.confirCode && <input type="text" placeholder="code de confirmation à l'achat de l'ouvrage" value={codeSub} onChange={(e) => setCodeSub(e.target.value)} className="form-control mb-2" required />}            </>
       </Modal.Body>
       <Modal.Footer>
-        <Button variant="secondary" onClick={() => setCanDownload({ sendCode, confirCode: false })}>
+        <Button variant="secondary" onClick={() => setCanDownload({ sendCode: false, confirCode: false })}>
           Fermer
         </Button>
         {canDownload.sendCode ? (

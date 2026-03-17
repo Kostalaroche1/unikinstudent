@@ -1,109 +1,83 @@
-
 "use client";
 
-import { useEffect, useId, useState } from "react";
+import { useEffect, useState } from "react";
 import SearchBar from "./SearchBar";
 import BookCard from "./BooksCard";
 import Link from "next/link";
-import { Button, Dropdown, Image } from "react-bootstrap";
-import { FaBars, FaDashcube, FaPersonBooth, FaRegistered, FaTimes, FaUser } from "react-icons/fa";
-import { FiLogIn, FiLogOut, FiSettings, FiUser } from "react-icons/fi";
+import { Dropdown, Image } from "react-bootstrap";
+import { FaPersonBooth, FaRegistered, FaUser } from "react-icons/fa";
+import { FiLogIn, FiLogOut } from "react-icons/fi";
 import { useSession } from "next-auth/react";
 import { useUserContext } from "../ContextComponent/UserAuth";
 import { deleteCookie, getAuth } from "./AuthForm";
 
+const fallbackBooks = [
+    {
+        id: "demo-1",
+        title: "L'Etranger",
+        author: "Albert Camus",
+        price: 12.5,
+        image: "/bietuphoto/book.png",
+        pdf_url: "/pdf/st_exupery_le_petit_prince.pdf",
+    },
+    {
+        id: "demo-2",
+        title: "Le Petit Prince",
+        author: "Antoine de Saint-Exupery",
+        price: 10,
+        image: "/bietuphoto/book.png",
+        pdf_url: "/pdf/st_exupery_le_petit_prince.pdf",
+    },
+];
+
+const normalizeBooks = (books) =>
+    books
+        .filter((item) => item && typeof item === "object")
+        .map((item, index) => ({
+            ...item,
+            id: item.id ?? item.id_book ?? `book-${index}`,
+            title: typeof item.title === "string" ? item.title : "",
+            author: typeof item.author === "string" ? item.author : "Unknown author",
+            price: item.price ?? 0,
+            image: item.image || "/bietuphoto/book.png",
+            pdf_url: typeof item.pdf_url === "string" ? item.pdf_url : "",
+        }));
+
 export default function HomePage() {
     const [search, setSearch] = useState("");
-    const dates = Date.now()
-    const [book, setBook] = useState([])
-    const { data: session } = useSession()
-    const { user, setUser } = useUserContext()
-    const data = [
-        {
-            id: useId(),
-            title: "L'Étranger",
-            author: "Albert Camus",
-            price: 12.5,
-            image: "/bietuphoto/livre.jpg",
-            pdf_url: "/pdf/st_exupery_le_petit_prince.pdf",
-            createdBy: new Date("2024-01-10"),
-            createdAt: new Date("2024-02-03")
-        },
-        {
-            id: useId(),
-            title: "Le Petit Prince",
-            author: "Antoine de Saint-Exupéry",
-            price: 10,
-            image: "/bietuphoto/livre.jpg",
-            pdf_url: "https://res.cloudinary.com/dhh7di2sp/raw/upload/v1763618958/books-pdf/roman1_e5es9c.pdf",
-            createdBy: new Date("2024-03-12"),
-            createdAt: new Date("2024-03-29")
-        },
-        {
-            id: useId(),
-            title: "1984",
-            author: "George Orwell",
-            price: 14,
-            image: "/bietuphoto/livre.jpg",
-            pdf_url: "/pdf/st_exupery_le_petit_prince.pdf",
-            createdBy: new Date("2024-04-01"),
-            createdAt: new Date("2024-04-20")
-        },
-        {
-            id: useId(),
-            title: "L'Alchimiste",
-            author: "Paulo Coelho",
-            price: 16,
-            image: "/bietuphoto/livre.jpg",
-            pdf_url: "/pdf/st_exupery_le_petit_prince.pdf",
-            createdBy: new Date("2024-05-18"),
-            createdAt: new Date("2024-06-03")
-        },
-        {
-            id: useId(),
-            title: "Les Misérables",
-            author: "Victor Hugo",
-            price: 18,
-            image: "/bietuphoto/livre.jpg",
-            pdf_url: "/pdf/st_exupery_le_petit_prince.pdf",
-            createdBy: new Date("2024-06-10"),
-            createdAt: new Date("2024-07-01")
-        }
-    ];
+    const [book, setBook] = useState([]);
+    const { data: session } = useSession();
+    const { user, setUser } = useUserContext();
 
     async function fetchBooks() {
-        console.log("session", session)
         if (!user) {
-            const dataAuth = await getAuth()
+            const dataAuth = await getAuth();
             if (dataAuth) {
-                setUser(dataAuth)
+                setUser(dataAuth);
             }
         }
 
         try {
-            const res = await fetch('/api/book');
-            const data = await res.json();
-            console.log(data.books, "data inside fetchboos Homepage", Array.isArray(data.books))
-            if (Array.isArray(data.books)) {
-                if (book.length < 1) {
-                    setBook(data.books)
-                }
+            const res = await fetch("/api/book", { cache: "no-store" });
+            if (!res.ok) {
+                throw new Error("Failed to fetch books");
             }
+
+            const data = await res.json();
+            const booksFromApi = Array.isArray(data.books) ? normalizeBooks(data.books) : [];
+            setBook(booksFromApi.length > 0 ? booksFromApi : fallbackBooks);
         } catch (err) {
             console.error(err);
-            alert('Erreur lors du chargement des livres');
+            setBook(fallbackBooks);
         }
     }
 
-
     useEffect(() => {
-        fetchBooks()
-
-    }, [])
-
+        fetchBooks();
+    }, []);
 
     const filteredBooks = book.filter((bk) =>
-        bk.title.toLowerCase().includes(search.toLowerCase())
+        (bk.title || "").toLowerCase().includes(search.toLowerCase())
     );
 
     return (
@@ -114,25 +88,22 @@ export default function HomePage() {
                 </p>
 
                 {((user === null) || Object.keys(user).length === 0) || !session ? (
-                    <>
-                        <Dropdown align="end" className="ms-0">
-                            <Dropdown.Toggle
-                                as="div"
-                                style={{ cursor: "pointer" }}
-
-                            >
-                                <FiLogIn />   Connexion
-                            </Dropdown.Toggle>
-                            <Dropdown.Menu>
-                                <Dropdown.Item as={Link} href="/auth">
-                                    <FaRegistered className="me-2" />  Créer compte
-                                </Dropdown.Item>
-                                <Dropdown.Item as={Link} href="/auth">
-                                    <FiLogIn className="me-2" />  Connexion
-                                </Dropdown.Item>
-                            </Dropdown.Menu>
-                        </Dropdown>
-                    </>
+                    <Dropdown align="end" className="ms-0">
+                        <Dropdown.Toggle
+                            as="div"
+                            style={{ cursor: "pointer" }}
+                        >
+                            <FiLogIn /> Connexion
+                        </Dropdown.Toggle>
+                        <Dropdown.Menu>
+                            <Dropdown.Item as={Link} href="/auth">
+                                <FaRegistered className="me-2" /> Creer compte
+                            </Dropdown.Item>
+                            <Dropdown.Item as={Link} href="/auth">
+                                <FiLogIn className="me-2" /> Connexion
+                            </Dropdown.Item>
+                        </Dropdown.Menu>
+                    </Dropdown>
                 ) : (
                     <Dropdown align="end" className="ms-0">
                         <Dropdown.Toggle
@@ -148,22 +119,20 @@ export default function HomePage() {
                             />
                         </Dropdown.Toggle>
                         <Dropdown.Menu>
-                            <Dropdown.Item as={Link} href={"/admin"}>
-                                <FaUser className="me-2" />  {session.user?.name}
+                            <Dropdown.Item as={Link} href="/admin">
+                                <FaUser className="me-2" /> {session.user?.name}
                             </Dropdown.Item>
-                            {user.role === 'superadmin' && <Dropdown.Item as={Link} href={"/admin"}>
-                                <FaPersonBooth className="me-2" />  Dashboard
-                            </Dropdown.Item>
-                            }<Dropdown.Item onClick={async () => deleteCookie()}>
-                                <FiLogOut className="me-2" />    Deconnecter
-                            </Dropdown.Item>
-                            <Dropdown.Item as={Link} href="/auth">
-                                {/* <FiUser className="me-2" /> créer un compte */}
+                            {user.role === "superadmin" && (
+                                <Dropdown.Item as={Link} href="/admin">
+                                    <FaPersonBooth className="me-2" /> Dashboard
+                                </Dropdown.Item>
+                            )}
+                            <Dropdown.Item onClick={async () => deleteCookie()}>
+                                <FiLogOut className="me-2" /> Deconnecter
                             </Dropdown.Item>
                         </Dropdown.Menu>
                     </Dropdown>
-                )
-                }
+                )}
             </div>
             <SearchBar search={search} setSearch={setSearch} />
             <BookCard book={filteredBooks} />
