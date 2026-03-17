@@ -1,21 +1,22 @@
 import { NextResponse } from "next/server"
 
-//DELETE COOKIE
-export const DELETE = async (req) => {
-    const response = NextResponse.json({ status: true, message: "Déconnexion effectuée" })
-    if (deleteCookie(process.env.JWT_SECRET_KEY_AUTH)) {
-        return response
-    } else {
-        return NextResponse.json({ status: false, message: "un probleme de deconnexion reesayer" })
-    }
+// DELETE COOKIE
+export async function DELETE() {
+    return deleteCookie("authToken");
 }
 
-export const deleteCookie = (token) => {
+export function deleteCookie(cookieName) {
     try {
-        cookieStore.set(token, "", { maxAge: -1, path: "/" })
-        //
-        return true
+        const response = NextResponse.json({ status: true, message: "Deconnexion effectuee" });
+        response.cookies.set(cookieName, "", {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "lax",
+            expires: new Date(0),
+            path: "/",
+        });
+        return response
     } catch (error) {
-        return false
+        return NextResponse.json({ status: false, message: "un probleme de deconnexion reesayer" })
     }
 }
