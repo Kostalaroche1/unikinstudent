@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { Form, Button, Card, Alert, Row, Col, ToggleButtonGroup, ToggleButton, Modal, Spinner } from "react-bootstrap";
 import { FaGoogle } from "react-icons/fa";
 import { useUserContext } from "../ContextComponent/UserAuth";
+import GoogleButton from "../LightComponent/GoogleButton";
 
 
 export default function AuthForm() {
@@ -126,7 +127,7 @@ export default function AuthForm() {
             {/* Social login buttons */}
             <Row className="text-center">
               <Col>
-                <Button variant="outline-danger" className="w-100 mb-2"
+                {/* <Button variant="outline-danger" className="w-100 mb-2"
                   disabled={loadData}
                   onClick={() => {
                     setLoadData(true)
@@ -135,7 +136,13 @@ export default function AuthForm() {
                 >
                   <FaGoogle className="me-2" />
                   Continuer avec google
-                </Button>
+                </Button> */}
+                <GoogleButton
+                  onClick={() => {
+                    setLoadData(true)
+                    signIn("google")
+                  }}
+                />
               </Col>
             </Row>
           </>}
